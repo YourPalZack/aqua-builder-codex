@@ -1,0 +1,28 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: aquabuilder
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U postgres" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: corepack enable && corepack prepare pnpm@9.0.0 --activate
+      - run: pnpm i
+      - name: Set DATABASE_URL
+        run: echo "DATABASE_URL=postgresql://postgres:password@localhost:5432/aquabuilder" >> $GITHUB_ENV
+      - run: pnpm -F @aquabuilder/db prisma migrate deploy
+      - run: pnpm build
+      - run: pnpm test
+

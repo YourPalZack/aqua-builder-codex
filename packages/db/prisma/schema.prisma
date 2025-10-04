@@ -1,0 +1,277 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  image         String?
+  role          Role     @default(USER)
+  builds        UserBuild[]
+  priceAlerts   PriceAlert[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Tank {
+  id         String   @id @default(cuid())
+  brand      String?
+  model      String?
+  material   Material
+  lengthCm   Float
+  widthCm    Float
+  heightCm   Float
+  volumeL    Float
+  volumeGal  Float
+  priceCents Int?
+  currency   String? @default("USD")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+enum Material {
+  GLASS
+  ACRYLIC
+}
+
+model Filter {
+  id            String   @id @default(cuid())
+  type          FilterType
+  gph           Int      // flow rate
+  maxTankGal    Int
+  mediaType     String?
+  brand         String?
+  model         String?
+  priceCents    Int?
+  currency      String? @default("USD")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum FilterType {
+  CANISTER
+  HOB
+  SPONGE
+  INTERNAL
+  WET_DRY
+  SUMP
+}
+
+model Heater {
+  id            String   @id @default(cuid())
+  wattage       Int
+  minTankGal    Int
+  maxTankGal    Int
+  brand         String?
+  model         String?
+  priceCents    Int?
+  currency      String? @default("USD")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Light {
+  id            String   @id @default(cuid())
+  type          LightType
+  intensity     LightIntensity // LOW MEDIUM HIGH
+  parAtDepth    Int?           // optional PAR reference
+  coverageCm    Float?         // length coverage
+  brand         String?
+  model         String?
+  priceCents    Int?
+  currency      String? @default("USD")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum LightType {
+  LED
+  T5
+  METAL_HALIDE
+}
+enum LightIntensity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Substrate {
+  id            String   @id @default(cuid())
+  type          SubstrateType
+  grainSizeMm   Float?
+  phBuffering   Boolean @default(false)
+  plantFriendly Boolean @default(false)
+  color         String?
+  brand         String?
+  priceCents    Int?
+  currency      String? @default("USD")
+}
+
+enum SubstrateType {
+  SAND
+  GRAVEL
+  SOIL
+  BARE_BOTTOM
+}
+
+model Fish {
+  id            String   @id @default(cuid())
+  commonName    String
+  scientific    String?
+  waterType     WaterType // FRESH BRACKISH SALT
+  minTankGal    Int
+  tempMinC      Float
+  tempMaxC      Float
+  phMin         Float
+  phMax         Float
+  temperament   Temperament
+  diet          Diet
+  adultSizeCm   Float
+  schoolingMin  Int?      // e.g., 6 for danios
+  bioloadFactor Float     // relative 0.5..3
+  reefSafe      Boolean   @default(false)
+  plantSafe     Boolean   @default(true)
+  invertSafe    Boolean   @default(true)
+}
+
+enum WaterType {
+  FRESH
+  BRACKISH
+  SALT
+}
+enum Temperament {
+  PEACEFUL
+  SEMI_AGGRESSIVE
+  AGGRESSIVE
+}
+enum Diet {
+  HERBIVORE
+  OMNIVORE
+  CARNIVORE
+}
+
+model Invertebrate {
+  id          String   @id @default(cuid())
+  commonName  String
+  waterType   WaterType
+  reefSafe    Boolean @default(true)
+  plantSafe   Boolean @default(true)
+  tempMinC    Float
+  tempMaxC    Float
+  phMin       Float
+  phMax       Float
+}
+
+model Plant {
+  id          String   @id @default(cuid())
+  commonName  String
+  lightNeeds  LightIntensity
+  co2Required Boolean @default(false)
+  difficulty  Difficulty
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model Coral {
+  id           String   @id @default(cuid())
+  commonName   String
+  lightReq     LightIntensity
+  flowReq      Flow
+  difficulty   Difficulty
+}
+
+enum Flow {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Equipment { // misc pumps, CO2, skimmers, chillers
+  id           String   @id @default(cuid())
+  category     String
+  brand        String?
+  model        String?
+  specJson     Json
+  priceCents   Int?
+  currency     String? @default("USD")
+}
+
+model CompatibilityRule {
+  id        String   @id @default(cuid())
+  aType     String   // FISH/INVERT/PLANT/CORAL/EQUIPMENT
+  aId       String
+  bType     String
+  bId       String
+  level     RuleLevel // BLOCK, WARN
+  reason    String
+}
+
+enum RuleLevel {
+  BLOCK
+  WARN
+}
+
+model UserBuild {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  buildType    BuildType
+  isPublic     Boolean  @default(true)
+  components   Json     // normalized component refs
+  bioloadPct   Float?   // calculated
+  compatScore  Int?     // 0..100
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+enum BuildType {
+  FRESH_COMMUNITY
+  FRESH_PLANTED
+  FRESH_CICHLID
+  BRACKISH
+  FOWLR
+  REEF
+  NANO_REEF
+  PALUDARIUM
+  BIOTOPE
+}
+
+model ProductPrice {
+  id          String   @id @default(cuid())
+  productType String   // e.g., FILTER, LIGHT, FISH
+  productId   String
+  retailer    String
+  priceCents  Int
+  currency    String   @default("USD")
+  inStock     Boolean  @default(true)
+  url         String
+  timestamp   DateTime @default(now())
+  @@index([productType, productId, retailer, timestamp])
+}
+
+model PriceAlert {
+  id          String   @id @default(cuid())
+  userId      String
+  productType String
+  productId   String
+  targetCents Int
+  active      Boolean @default(true)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+}
