@@ -5,8 +5,12 @@
     "moduleResolution": "Bundler",
     "target": "ES2022",
     "types": ["node"],
-    "strict": true
+    "strict": true,
+    "baseUrl": "./",
+    "paths": {
+      "@aquabuilder/db": ["../../packages/db/src/index.ts"],
+      "@aquabuilder/db/*": ["../../packages/db/src/*"]
+    }
   },
   "include": ["src/**/*"]
 }
-
