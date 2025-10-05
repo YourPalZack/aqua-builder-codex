@@ -21,3 +21,13 @@ Planned next:
  - Auth: Added dev auth stub and `requireAdmin`; `/api/admin/prices` now guarded (dev allows).
  - API Validation: Parts endpoint now validates query params with zod and returns standardized error envelopes.
  - Analytics: Added minimal `logEvent` util and server-side `build_saved` event on build creation.
+ - Added `/api/analytics` endpoint + client sender (beacon/fetch) and QA test.
+ - Alerts + Builds List: moved/added zod schemas to shared; routes now validate and return consistent error envelopes.
+- Dev Auth: Added `/api/auth/login` and `/api/auth/logout` to toggle `admin` cookie for quick testing.
+ - Session: Added `/api/auth/session`; middleware now uses session-driven guard. Header chip shows Admin status.
+- Browse: Unified pagination UI and applied server search/pagination across all lists.
+ - Parts API: Added `lightNeeds`/`difficulty`/`co2` filters for `plants` and `category` filter for `equipment`; fixed query parsing for `q`/`count`. When `count` is present, responses include `{ items, total }`.
+- Browse UI: Plants now drives server-side `lightNeeds`; Extras exposes category chips and uses unified Pagination.
+ - Scraper: Added Amazon PA-API integration with SigV4 signing; Amazon jobs fetch price by ASIN and store affiliate-tagged URLs. Fallback to synthetic prices when env not configured.
+ - Web API: Added `/api/amazon/popular` to return affiliate-tagged popular items per equipment category via Amazon PA-API SearchItems.
+ - Admin: Prices page defaults retailer to Amazon and accepts optional Product URL; server auto-appends affiliate tag for Amazon URLs.

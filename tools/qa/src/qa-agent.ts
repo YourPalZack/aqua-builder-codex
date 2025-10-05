@@ -4,6 +4,7 @@
 */
 
 import assert from 'node:assert';
+let lastBuildId: string | null = null;
 
 type TestResult = { name: string; ok: boolean; info?: string; error?: unknown; agent?: string };
 
@@ -46,6 +47,44 @@ async function testPartsFilters(): Promise<TestResult[]> {
   return results;
 }
 
+async function testPlantsAndExtrasFilters(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/parts/[category]/route');
+    // Plants: lightNeeds filter
+    const reqP = new Request('http://localhost/api/parts/plants?lightNeeds=LOW');
+    const plants = await callRoute<any[]>(mod.GET, { params: Promise.resolve({ category: 'plants' }) }, reqP);
+    if (!Array.isArray(plants)) throw new Error('plants not array');
+    results.push({ name: 'GET /api/parts/plants?lightNeeds=LOW', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/parts/plants?lightNeeds=LOW', ok: false, error: e, agent: 'Web Agent' });
+  }
+  try {
+    const mod = await import('../../../apps/web/src/app/api/parts/[category]/route');
+    // Equipment: category filter
+    const reqE = new Request('http://localhost/api/parts/equipment?category=CO2%20Kit');
+    const extras = await callRoute<any[]>(mod.GET, { params: Promise.resolve({ category: 'equipment' }) }, reqE);
+    if (!Array.isArray(extras)) throw new Error('equipment not array');
+    results.push({ name: 'GET /api/parts/equipment?category=CO2 Kit', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/parts/equipment?category=CO2 Kit', ok: false, error: e, agent: 'Web Agent' });
+  }
+  return results;
+}
+
+async function testPartsCountHeader(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/parts/[category]/route');
+    const req = new Request('http://localhost/api/parts/fish?page=1&pageSize=5&count=1');
+    await mod.GET(req as any, { params: Promise.resolve({ category: 'fish' }) });
+    results.push({ name: 'GET /api/parts/fish with count header', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/parts/fish with count header', ok: false, error: e, agent: 'Web Agent' });
+  }
+  return results;
+}
+
 async function testPartsInvalidCategory(): Promise<TestResult[]> {
   const results: TestResult[] = [];
   try {
@@ -84,6 +123,7 @@ async function testBuildCreateAndFetch(): Promise<TestResult[]> {
     const txt = await res.text?.() ?? '';
     const created = txt ? JSON.parse(txt) : {};
     assert(created && created.id, 'missing id');
+    lastBuildId = created.id;
     results.push({ name: 'POST /api/builds', ok: true });
 
     const show = await import('../../../apps/web/src/app/api/builds/[id]/route');
@@ -156,6 +196,107 @@ async function testOgRoute(): Promise<TestResult[]> {
   return results;
 }
 
+async function testOgWithId(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/og/route');
+    const id = lastBuildId ?? 'unknown';
+    const req = new Request(`http://localhost/api/og?id=${id}`);
+    const res = await mod.GET(req as any);
+    // @ts-ignore
+    const svg = await res.text?.() ?? '';
+    if (!svg.includes('<svg')) throw new Error('no svg');
+    results.push({ name: 'GET /api/og?id=...', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/og?id=...', ok: false, error: e, agent: 'Sharing Agent' });
+  }
+  return results;
+}
+
+async function testAnalyticsPost(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/analytics/route');
+    const req = new Request('http://localhost/api/analytics', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: 'qa_event', props: { a: 1 } }) });
+    const res = await mod.POST(req as any);
+    // @ts-ignore
+    const txt = await res.text?.() ?? '';
+    const data = txt ? JSON.parse(txt) : {};
+    if (!data?.ok) throw new Error('analytics not ok');
+    results.push({ name: 'POST /api/analytics', ok: true });
+  } catch (e) {
+    results.push({ name: 'POST /api/analytics', ok: false, error: e, agent: 'Analytics Agent' });
+  }
+  return results;
+}
+
+async function testAmazonPopular(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/amazon/popular/route');
+    const req = new Request('http://localhost/api/amazon/popular?category=filters');
+    const res = await mod.GET(req as any);
+    // @ts-ignore
+    const txt = await res.text?.() ?? '';
+    const data = txt ? JSON.parse(txt) : {};
+    if (!Array.isArray(data) && !data?.error) throw new Error('expected array or error envelope');
+    results.push({ name: 'GET /api/amazon/popular?category=filters', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/amazon/popular?category=filters', ok: false, error: e, agent: 'Web Agent' });
+  }
+  return results;
+}
+
+async function testAdminAmazonFetch(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/admin/amazon/fetch/route');
+    const body = { productType: 'FILTER', productId: 'filter-hob-50', url: 'https://www.amazon.com/dp/B000000000' };
+    const req = new Request('http://localhost/api/admin/amazon/fetch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const res = await mod.POST(req as any);
+    // @ts-ignore
+    const txt = await res.text?.() ?? '';
+    const data = txt ? JSON.parse(txt) : {};
+    const ok = (data && data.id) || (data && data.fallbackRow && data.fallbackRow.id);
+    if (!ok) throw new Error('expected created row or fallbackRow');
+    results.push({ name: 'POST /api/admin/amazon/fetch', ok: true });
+  } catch (e) {
+    results.push({ name: 'POST /api/admin/amazon/fetch', ok: false, error: e, agent: 'Admin/Web Agent' });
+  }
+  return results;
+}
+async function testAuthLogin(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/auth/login/route');
+    const res = await mod.POST();
+    // @ts-ignore
+    const txt = await res.text?.() ?? '';
+    const data = txt ? JSON.parse(txt) : {};
+    if (!data?.ok) throw new Error('login not ok');
+    results.push({ name: 'POST /api/auth/login', ok: true });
+  } catch (e) {
+    results.push({ name: 'POST /api/auth/login', ok: false, error: e, agent: 'Auth Agent' });
+  }
+  return results;
+}
+
+async function testAuthSession(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/auth/session/route');
+    const res = await mod.GET(new Request('http://localhost/api/auth/session') as any);
+    // @ts-ignore
+    const txt = await res.text?.() ?? '';
+    const data = txt ? JSON.parse(txt) : {};
+    if (!data?.ok) throw new Error('session not ok');
+    results.push({ name: 'GET /api/auth/session', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/auth/session', ok: false, error: e, agent: 'Auth Agent' });
+  }
+  return results;
+}
+
 async function testAdminPricePost(): Promise<TestResult[]> {
   const results: TestResult[] = [];
   try {
@@ -170,6 +311,23 @@ async function testAdminPricePost(): Promise<TestResult[]> {
     results.push({ name: 'POST /api/admin/prices', ok: true });
   } catch (e) {
     results.push({ name: 'POST /api/admin/prices', ok: false, error: e, agent: 'Pricing/Admin Agent' });
+  }
+  return results;
+}
+
+async function testAlertsInvalid(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/alerts/route');
+    const req = new Request('http://localhost/api/alerts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+    const res = await mod.POST(req as any);
+    // @ts-ignore
+    const txt = await res.text?.() ?? '';
+    const data = txt ? JSON.parse(txt) : {};
+    if (!data?.error) throw new Error('expected validation error');
+    results.push({ name: 'POST /api/alerts (invalid)', ok: true });
+  } catch (e) {
+    results.push({ name: 'POST /api/alerts (invalid)', ok: false, error: e, agent: 'Web Agent' });
   }
   return results;
 }
@@ -200,11 +358,20 @@ async function main() {
   all.push(...await testPricesGet());
   all.push(...await testBuildsList());
   all.push(...await testPartsFilters());
+  all.push(...await testPartsCountHeader());
   all.push(...await testPartsInvalidCategory());
   all.push(...await testPartsInvalidParams());
+  all.push(...await testPlantsAndExtrasFilters());
   all.push(...await testAdminPricePost());
+  all.push(...await testAlertsInvalid());
   all.push(...await testInitialCostRoute());
   all.push(...await testOgRoute());
+  all.push(...await testOgWithId());
+  all.push(...await testAnalyticsPost());
+  all.push(...await testAuthLogin());
+  all.push(...await testAuthSession());
+  all.push(...await testAmazonPopular());
+  all.push(...await testAdminAmazonFetch());
   summarize(all);
 }
 

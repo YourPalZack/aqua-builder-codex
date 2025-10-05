@@ -275,3 +275,14 @@ model PriceAlert {
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
 }
+
+model AmazonLink {
+  id          String   @id @default(cuid())
+  productType String
+  productId   String
+  asin        String
+  url         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@unique([productType, productId])
+}
