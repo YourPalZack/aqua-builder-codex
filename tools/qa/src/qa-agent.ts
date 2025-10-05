@@ -46,6 +46,33 @@ async function testPartsFilters(): Promise<TestResult[]> {
   return results;
 }
 
+async function testPartsInvalidCategory(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/parts/[category]/route');
+    const data = await callRoute<any>(mod.GET, { params: Promise.resolve({ category: 'widgets' }) }, new Request('http://localhost/api/parts/widgets'));
+    if (!data?.error) throw new Error('expected error for invalid category');
+    results.push({ name: 'GET /api/parts/widgets (invalid)', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/parts/widgets (invalid)', ok: false, error: e, agent: 'Web Agent' });
+  }
+  return results;
+}
+
+async function testPartsInvalidParams(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/parts/[category]/route');
+    const req = new Request('http://localhost/api/parts/heaters?wattMin=abc');
+    const data = await callRoute<any>(mod.GET, { params: Promise.resolve({ category: 'heaters' }) }, req);
+    if (!data?.error) throw new Error('expected error for invalid params');
+    results.push({ name: 'GET /api/parts/heaters?wattMin=abc (invalid)', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/parts/heaters?wattMin=abc (invalid)', ok: false, error: e, agent: 'Web Agent' });
+  }
+  return results;
+}
+
 async function testBuildCreateAndFetch(): Promise<TestResult[]> {
   const results: TestResult[] = [];
   try {
@@ -95,6 +122,40 @@ async function testBuildsList(): Promise<TestResult[]> {
   return results;
 }
 
+async function testInitialCostRoute(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/costs/initial/route');
+    const body = { equipment: { filter: 'filter-hob-50', extras: [] } };
+    const req = new Request('http://localhost/api/costs/initial', { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } });
+    const res = await mod.POST(req as any);
+    // @ts-ignore
+    const txt = await res.text?.() ?? '';
+    const data = txt ? JSON.parse(txt) : {};
+    if (typeof data?.priceCents !== 'number') throw new Error('missing priceCents');
+    results.push({ name: 'POST /api/costs/initial', ok: true });
+  } catch (e) {
+    results.push({ name: 'POST /api/costs/initial', ok: false, error: e, agent: 'Web Agent' });
+  }
+  return results;
+}
+
+async function testOgRoute(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/og/route');
+    const req = new Request('http://localhost/api/og?title=QA%20Test');
+    const res = await mod.GET(req as any);
+    // @ts-ignore
+    const svg = await res.text?.() ?? '';
+    if (!svg.includes('<svg')) throw new Error('no svg');
+    results.push({ name: 'GET /api/og', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/og', ok: false, error: e, agent: 'Sharing Agent' });
+  }
+  return results;
+}
+
 async function testAdminPricePost(): Promise<TestResult[]> {
   const results: TestResult[] = [];
   try {
@@ -139,7 +200,11 @@ async function main() {
   all.push(...await testPricesGet());
   all.push(...await testBuildsList());
   all.push(...await testPartsFilters());
+  all.push(...await testPartsInvalidCategory());
+  all.push(...await testPartsInvalidParams());
   all.push(...await testAdminPricePost());
+  all.push(...await testInitialCostRoute());
+  all.push(...await testOgRoute());
   summarize(all);
 }
 

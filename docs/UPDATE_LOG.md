@@ -14,3 +14,10 @@ Planned next:
 - Tank picker; equipment warnings; Build Summary page; score and sparkline.
 - M1 start: Added UI primitives (Chip, Toast, ScoreBadge), wizard score and equipment guidance card, and Browse fish/filters filter chips with basic pagination. Updated layout to include Toast container.
 - Added core checks (water type, predation, aggression, schooling), recommendations (light coverage/substrate), and costs. Wired into Wizard and Summary. Parts API now supports pagination and basic filters; Community page lists public builds via new API. QA agent updated to cover builds list. Initial and monthly cost estimates appear in Wizard and Summary.
+ - Added server-side initial cost route at `apps/web/src/app/api/costs/initial/route.ts` with zod validation; Wizard can adopt this to reduce client fetches.
+ - Replaced OG placeholder with SVG generator at `apps/web/src/app/api/og/route.ts` supporting `title`/`subtitle` params for share cards.
+ - Extended shared schemas with `InitialCostSchema` and `PaginationQuerySchema`.
+ - QA Agent: added tests for initial cost route and OG image endpoint; all checks green via `pnpm qa`.
+ - Auth: Added dev auth stub and `requireAdmin`; `/api/admin/prices` now guarded (dev allows).
+ - API Validation: Parts endpoint now validates query params with zod and returns standardized error envelopes.
+ - Analytics: Added minimal `logEvent` util and server-side `build_saved` event on build creation.
