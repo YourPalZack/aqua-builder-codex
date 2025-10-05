@@ -77,4 +77,24 @@ Risk/Mitigation
 Runbook for Agents
 - Before merge: run `pnpm --filter ./apps/web build` and `pnpm qa`.
 - Update docs/UPDATE_LOG.md with each delivery; keep docs/TODO.md in sync.
+Major Functions (see docs/FUNCTIONS.md)
+- Core compatibility functions: filter/heater/light checks, water type, predation, aggression/territory, schooling, param overlap (present + expand).
+- Recommendations: light coverage, substrate per build type.
+- Cost engine: initial and monthly estimates.
+- API validation helpers and error envelopes.
+- Scraper jobs: fetch/parse/write/prune/check alerts; email senders.
+- Sharing: serialize/deserialize builds; OG image route.
+- Auth: session wrapper and admin guard.
+- Community: public builds list with filters.
+
+Parallel Tracks & Sub‑Agents (multitask)
+- Core Agent: expand compatibility + recommendations + cost engine.
+- Web Agent: shared zod schemas, error helpers, pagination + filters in API.
+- UI Agent: ScoreBadge/CompatibilityPanel polish, DataTable for admin, hooks (debounce/toast).
+- Pricing/Admin Agent: list/edit prices table, API upsert safeguards.
+- Auth Agent: NextAuth stub + requireAdmin middleware; guard /admin.
+- Scraper Agent: write stubs for schedule/fetch/parse/write; integrate fallback, then enable with Redis.
+- Sharing Agent: add OG image route and build state serializer.
+- Community Agent: public builds page with filters (date, type, score).
+- QA/Test Agent: extend tests to cover new routes and summary score, and basic UI render sanity (where possible).
 

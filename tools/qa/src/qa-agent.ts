@@ -7,8 +7,8 @@ import assert from 'node:assert';
 
 type TestResult = { name: string; ok: boolean; info?: string; error?: unknown; agent?: string };
 
-async function callRoute<T>(handler: Function, ctx: any): Promise<T> {
-  const res = await handler(new Request('http://localhost'), ctx);
+async function callRoute<T>(handler: Function, ctx: any, req?: Request): Promise<T> {
+  const res = await handler(req ?? new Request('http://localhost'), ctx);
   // NextResponse-like
   // @ts-ignore
   const txt = await res.text?.() ?? '';
@@ -32,6 +32,20 @@ async function testPartsEndpoints(): Promise<TestResult[]> {
   return results;
 }
 
+async function testPartsFilters(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/parts/[category]/route');
+    const req = new Request('http://localhost/api/parts/filters?type=HOB');
+    const data = await callRoute<any[]>(mod.GET, { params: Promise.resolve({ category: 'filters' }) }, req);
+    if (!Array.isArray(data)) throw new Error('not array');
+    results.push({ name: 'GET /api/parts/filters?type=HOB', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/parts/filters?type=HOB', ok: false, error: e, agent: 'Web Agent' });
+  }
+  return results;
+}
+
 async function testBuildCreateAndFetch(): Promise<TestResult[]> {
   const results: TestResult[] = [];
   try {
@@ -51,6 +65,32 @@ async function testBuildCreateAndFetch(): Promise<TestResult[]> {
     results.push({ name: 'GET /api/builds/:id', ok: true });
   } catch (e) {
     results.push({ name: 'build create/fetch', ok: false, error: e, agent: 'Web Agent' });
+  }
+  return results;
+}
+
+async function testPricesGet(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/prices/[productType]/[productId]/route');
+    const rows = await callRoute<any[]>(mod.GET, { params: Promise.resolve({ productType: 'FILTER', productId: 'filter-hob-50' }) });
+    if (!Array.isArray(rows)) throw new Error('not array');
+    results.push({ name: 'GET /api/prices/:type/:id', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/prices/:type/:id', ok: false, error: e, agent: 'Web Agent' });
+  }
+  return results;
+}
+
+async function testBuildsList(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/builds/list/route');
+    const rows = await callRoute<any[]>(mod.GET, {});
+    if (!Array.isArray(rows)) throw new Error('not array');
+    results.push({ name: 'GET /api/builds/list', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/builds/list', ok: false, error: e, agent: 'Web Agent' });
   }
   return results;
 }
@@ -96,6 +136,9 @@ async function main() {
   const all: TestResult[] = [];
   all.push(...await testPartsEndpoints());
   all.push(...await testBuildCreateAndFetch());
+  all.push(...await testPricesGet());
+  all.push(...await testBuildsList());
+  all.push(...await testPartsFilters());
   all.push(...await testAdminPricePost());
   summarize(all);
 }

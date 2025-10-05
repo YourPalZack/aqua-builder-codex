@@ -3,20 +3,18 @@
 Planned next features (10–20 items):
 
 Phase 2 (see docs/PHASE_2_PLAN.md for detail):
-1. [Wizard Agent] Compatibility score banner and Step 5 (Review & Share).
-2. [Wizard Agent] Equipment hints (GPH, W/gal, coverage) panel.
-3. [Browse Agent] Substrate and Extras tabs.
-4. [Browse Agent] Filter chips (min tank, intensity, wattage) + pagination.
-5. [UI Agent] Tabs, Chip, Toast, ScoreBadge components; Soft UI polish.
-6. [Wizard Agent] LocalStorage persistence and hydration.
-7. [Pricing/Admin Agent] /admin/prices UI + zod-validated API.
-8. [Web Agent] Shared zod types + standardized error envelopes.
-9. [Core Agent] Recommendation helpers and beginner score export.
-10. [Summary Owner] Polished summary with score, warnings, sparkline.
-11. [Auth Agent] NextAuth stub + guard /admin.
-12. [Analytics Agent] PostHog events (build_saved, fish_added, equipment_selected).
-13. [QA/Test Agent] Expand tools/qa to test score display, tabs, admin save, summary.
-14. [QA/Test Agent] Add Vitest unit tests in packages/core.
-15. [Web Agent] Error boundary and empty states site-wide.
-16. [Infra/CI Agent] Add core unit tests step in CI.
+1. [Core Agent] Expand compatibility: water type, predation, aggression/territory, schooling edge cases.
+2. [Core Agent] Recommendations: light coverage and substrate by build type.
+3. [Core Agent] Cost engine: initial + monthly estimates.
+4. [Web Agent] Shared zod types + standardized error envelopes across all routes.
+5. [UI Agent] DataTable for admin; debounce/loader hooks; polish chips & panels.
+6. [Wizard Agent] Review & Share polish; show cost estimates alongside score.
+7. [Summary Owner] Beginner score parity and warnings render (done); add cost/sparkline blocks.
+8. [Pricing/Admin Agent] Price table (done) + inline edit UX.
+9. [Auth Agent] NextAuth stub + requireAdmin guard for /admin.
+10. [Scraper Agent] Scaffolds for schedule/fetch/parse/write/prune/checkAlerts; wire later with Redis.
+11. [Sharing Agent] OG image route and build state serializer/deserializer.
+12. [Community Agent] Public builds list with filters.
+13. [QA/Test Agent] Extend coverage to new routes and cost/score sanity checks.
+14. [Infra/CI Agent] Add core unit tests and QA runner step in CI.
 A

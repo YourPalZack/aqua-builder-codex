@@ -8,6 +8,7 @@
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.6",
     "turbo": "^2.5.8",
     "typescript": "^5.9.3"
   },
@@ -21,7 +22,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "qa": "bash -lc 'cd tools/qa && node --import \"data:text/javascript,import { register } from \\\"node:module\\\"; import { pathToFileURL } from \\\"node:url\\\"; register(\\\"ts-node/esm\\\", pathToFileURL(\\\"./\\\"));\" src/qa-agent.ts'"
+    "qa": "bash -lc 'cd tools/qa && tsx src/qa-agent.ts'"
   },
   "dependencies": {
     "date-fns": "^4.1.0",

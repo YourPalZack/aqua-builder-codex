@@ -25,4 +25,4 @@ jobs:
       - run: pnpm -F @aquabuilder/db prisma migrate deploy
       - run: pnpm build
       - run: pnpm test
-
+      - run: pnpm qa
