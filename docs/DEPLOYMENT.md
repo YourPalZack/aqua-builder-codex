@@ -17,7 +17,13 @@ Environment variables for Amazon affiliate integration:
 - AMAZON_PARTNER_TAG: Your Associates tag (e.g., aquabuilder-20)
 - AMAZON_REGION: PA-API region (default us-east-1)
 - AMAZON_HOST: PA-API host (default webservices.amazon.com)
+See docs/AMAZON.md for step-by-step instructions on obtaining these keys.
 
 Notes:
 - The scraper auto-detects `retailer: 'Amazon'` jobs, extracts the ASIN from the job URL, fetches price via PA-API, and stores affiliate-tagged URLs in ProductPrice.
 - When env is missing, price fetch falls back to synthetic test prices to keep flows working.
+
+Auth (NextAuth):
+- Set `NEXTAUTH_SECRET` (random string) and `NEXTAUTH_URL` (e.g., https://yourdomain.com)
+- Dev credentials provider is enabled: set `ADMIN_EMAIL` and `ADMIN_PASSCODE` to issue an admin JWT when using the sign-in form.
+- Middleware uses JWT to guard `/admin` in production.

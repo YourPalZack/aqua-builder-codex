@@ -29,5 +29,8 @@ Planned next:
  - Parts API: Added `lightNeeds`/`difficulty`/`co2` filters for `plants` and `category` filter for `equipment`; fixed query parsing for `q`/`count`. When `count` is present, responses include `{ items, total }`.
 - Browse UI: Plants now drives server-side `lightNeeds`; Extras exposes category chips and uses unified Pagination.
  - Scraper: Added Amazon PA-API integration with SigV4 signing; Amazon jobs fetch price by ASIN and store affiliate-tagged URLs. Fallback to synthetic prices when env not configured.
- - Web API: Added `/api/amazon/popular` to return affiliate-tagged popular items per equipment category via Amazon PA-API SearchItems.
- - Admin: Prices page defaults retailer to Amazon and accepts optional Product URL; server auto-appends affiliate tag for Amazon URLs.
+- Web API: Added `/api/amazon/popular` to return affiliate-tagged popular items per equipment category via Amazon PA-API SearchItems.
+- Admin: Prices page defaults retailer to Amazon and accepts optional Product URL; server auto-appends affiliate tag for Amazon URLs.
+ - Community: `/api/builds/list` now supports pagination and optional `count`; Community page uses server pagination and renders controls.
+ - Plants Browse: Added server-driven filters for `difficulty` and `CO2` chips; UI wired to backend.
+ - Analytics: Amazon buy links send `amazon_buy_click` to `/api/analytics` with product info.

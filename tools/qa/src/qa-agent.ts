@@ -162,6 +162,23 @@ async function testBuildsList(): Promise<TestResult[]> {
   return results;
 }
 
+async function testBuildsListCount(): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+  try {
+    const mod = await import('../../../apps/web/src/app/api/builds/list/route');
+    const req = new Request('http://localhost/api/builds/list?count=1&page=1&pageSize=5');
+    const res: any = await mod.GET(req as any);
+    // @ts-ignore
+    const txt = await res.text?.();
+    const data = txt ? JSON.parse(txt) : {};
+    if (!data || !Array.isArray(data.items)) throw new Error('missing items');
+    results.push({ name: 'GET /api/builds/list with count', ok: true });
+  } catch (e) {
+    results.push({ name: 'GET /api/builds/list with count', ok: false, error: e, agent: 'Web Agent' });
+  }
+  return results;
+}
+
 async function testInitialCostRoute(): Promise<TestResult[]> {
   const results: TestResult[] = [];
   try {
@@ -357,6 +374,7 @@ async function main() {
   all.push(...await testBuildCreateAndFetch());
   all.push(...await testPricesGet());
   all.push(...await testBuildsList());
+  all.push(...await testBuildsListCount());
   all.push(...await testPartsFilters());
   all.push(...await testPartsCountHeader());
   all.push(...await testPartsInvalidCategory());
