@@ -20,6 +20,8 @@ Recent:
 - [Web Agent] Parts API: added plants `lightNeeds`/`difficulty`/`co2` and equipment `category` server filters; fixed `q`/`count` parsing bug; consistent `{ items, total }` when `count` requested.
 - [UI Agent] Plants uses server-side `lightNeeds`; Extras adds category chips and unified Pagination.
 - [Scraper/Web Agent] Amazon PA-API: added SearchItems & GetItems clients, `/api/amazon/popular` route, admin Amazon URL handling with affiliate tag.
+ - [Web Agent] Analytics: Added `community_filter_click`, `browse_tab_click`, and `detail_buy_click` events on key interactions.
+ - [Web Agent] SEO/Content: Added species detail pages for fish/plants/invertebrates/corals and expanded sitemap to include part/species pages.
 13. [QA/Test Agent] Extend coverage to new routes and cost/score sanity checks. (initial cost route + OG covered)
 14. [Infra/CI Agent] Add core unit tests and QA runner step in CI.
 A

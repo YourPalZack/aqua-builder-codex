@@ -33,4 +33,14 @@ Planned next:
 - Admin: Prices page defaults retailer to Amazon and accepts optional Product URL; server auto-appends affiliate tag for Amazon URLs.
  - Community: `/api/builds/list` now supports pagination and optional `count`; Community page uses server pagination and renders controls.
  - Plants Browse: Added server-driven filters for `difficulty` and `CO2` chips; UI wired to backend.
- - Analytics: Amazon buy links send `amazon_buy_click` to `/api/analytics` with product info.
+- Analytics: Amazon buy links send `amazon_buy_click` to `/api/analytics` with product info.
+ - Detail Pages: Added equipment detail pages with Product/AggregateOffer JSON-LD, sparkline, retailer list, and related items; browse list titles link to details; analytics events for detail nav and related clicks.
+- Popular (SSR): Amazon popular SSR now tracks clicks (`amazon_popular_click`) and shows affiliate disclosure.
+- Performance: Added cache headers to builds list and prices endpoints.
+ - Analytics/UI polish: Community tabs now log `community_filter_click`; detail retailer links track `detail_buy_click`; browse tabs log `browse_tab_click`.
+- SEO: Sitemap now includes part detail pages and a subset of species pages (fish/plants) for better discoverability.
+- Species: Added basic species detail pages at `/species/[category]/[id]` for fish/plants/invertebrates/corals with CreativeWork JSON-LD and breadcrumbs.
+ - Browse: Tab-specific meta descriptions added; ItemList JSON-LD now includes url, order, and numberOfItems for equipment and species tabs.
+ - Community: ItemList JSON-LD includes url, order, and numberOfItems.
+ - Admin: Price save normalizes Amazon URLs and preserves partner tag; admin UI shows host/tag status under URL.
+ - Analytics: Added add_to_build events across browse lists and build_create_click on Save & Copy Link.
