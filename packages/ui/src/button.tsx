@@ -8,7 +8,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = '', variant = 'primary', ...props }, ref) => {
     const base = 'inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
     const variants: Record<string, string> = {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700',
+      primary: 'bg-green-600 text-white hover:bg-green-700',
       secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
       ghost: 'bg-transparent hover:bg-gray-100',
     };
@@ -16,4 +16,3 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 Button.displayName = 'Button';
-

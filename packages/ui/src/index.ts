@@ -23,5 +23,6 @@ export * from './sortable-header';
 export * from './confirm-dialog';
 export * from './combobox';
 export * from './spinner';
+export { LoadingOverlay } from './spinner';
 export * from './spec-pills';
 export * from './pagination-numeric';

@@ -43,4 +43,5 @@ Planned next:
  - Browse: Tab-specific meta descriptions added; ItemList JSON-LD now includes url, order, and numberOfItems for equipment and species tabs.
  - Community: ItemList JSON-LD includes url, order, and numberOfItems.
  - Admin: Price save normalizes Amazon URLs and preserves partner tag; admin UI shows host/tag status under URL.
- - Analytics: Added add_to_build events across browse lists and build_create_click on Save & Copy Link.
+- Analytics: Added add_to_build events across browse lists and build_create_click on Save & Copy Link.
+ - Theme: Switched to Material light palette with green accent; updated global tokens and replaced blue/sky utility classes with green/emerald variants across UI components and pages (buttons, tabs, cards, focus rings, gradients).

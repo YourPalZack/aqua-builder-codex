@@ -13,9 +13,9 @@ type ListTileProps = {
 
 export function ListTile({ title, href, subtitle, leading, meta, actions, active, className = '' }: ListTileProps) {
   return (
-    <div className={["border rounded-2xl p-3 shadow-sm", active ? 'ring-2 ring-blue-400' : '', className].join(' ')}>
+    <div className={["border rounded-2xl p-3 shadow-sm", active ? 'ring-2 ring-green-400' : '', className].join(' ')}>
       <div className="flex items-start gap-3">
-        {leading ?? <div className="w-12 h-12 rounded bg-sky-100" aria-hidden />}
+        {leading ?? <div className="w-12 h-12 rounded bg-green-100" aria-hidden />}
         <div className="flex-1 min-w-0">
           {href ? (
             <a href={href} className="font-medium hover:underline">{title}</a>
@@ -34,4 +34,3 @@ export function ListTile({ title, href, subtitle, leading, meta, actions, active
     </div>
   );
 }
-

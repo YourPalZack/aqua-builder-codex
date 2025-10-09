@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "node --loader ts-node/esm src/index.ts",
+    "dev": "node -e \"if(!process.env.REDIS_URL){console.log('scraper: REDIS_URL not set; dev disabled');process.exit(0)}else{require('node:child_process').spawn('node',['--loader','ts-node/esm','src/index.ts'],{stdio:'inherit'})}\"",
     "start": "node dist/index.js",
     "build": "tsc -p tsconfig.json"
   },
@@ -21,4 +21,3 @@
     "typescript": "^5.5.0"
   }
 }
-

@@ -1,10 +1,5 @@
 
 > @aquabuilder/scraper@0.1.0 dev /Users/zackhayes/webdev/aqua-builder-codex/services/scraper
-> node --loader ts-node/esm src/index.ts
+> node -e "if(!process.env.REDIS_URL){console.log('scraper: REDIS_URL not set; dev disabled');process.exit(0)}else{require('node:child_process').spawn('node',['--loader','ts-node/esm','src/index.ts'],{stdio:'inherit'})}"
 
-(node:20887) ExperimentalWarning: `--experimental-loader` may be removed in the future; instead use `register()`:
---import 'data:text/javascript,import { register } from "node:module"; import { pathToFileURL } from "node:url"; register("ts-node/esm", pathToFileURL("./"));'
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:20887) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-Scraper disabled: set REDIS_URL to enable workers.
+scraper: REDIS_URL not set; dev disabled
