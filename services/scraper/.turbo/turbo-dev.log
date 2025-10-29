@@ -1,5 +1,5 @@
 
-> @aquabuilder/scraper@0.1.0 dev /Users/zackhayes/webdev/aqua-builder-codex/services/scraper
+> @aquabuilder/scraper@0.1.0 dev /home/user/aqua-builder-codex/services/scraper
 > node -e "if(!process.env.REDIS_URL){console.log('scraper: REDIS_URL not set; dev disabled');process.exit(0)}else{require('node:child_process').spawn('node',['--loader','ts-node/esm','src/index.ts'],{stdio:'inherit'})}"
 
 scraper: REDIS_URL not set; dev disabled
